@@ -36,10 +36,11 @@ async function readDatabase() {
 }
 
 export function writeUserData(firstName, lastName) {
-  set(ref(database, 'users/'), {
-    firstName: lastName
+  set(ref(database, 'users/user'), {
+    firstName : firstName,
+    lastName : lastName
   });
 }
 
-writeUserData("hello test");
+writeUserData("phillip", "lei");
 console.log("hi");
