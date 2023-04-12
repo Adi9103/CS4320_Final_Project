@@ -42,5 +42,8 @@ export function writeUserData(firstName, lastName) {
   });
 }
 
-writeUserData("phillip", "lei");
-console.log("hi");
+document.getElementById("nameButton").addEventListener("click", submitReport);
+
+function submitReport() {
+  writeUserData(document.getElementById("fname").value, document.getElementById("lname").value)
+}
