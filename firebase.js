@@ -34,9 +34,10 @@ async function readDatabase() {
 }
 
 export function writeUserData(text) {
-  set(ref(database, 'test/' + test), {
-    test: text
+  set(ref(database, '/test/Test/firstCollection/firstDoc'), {
+    "test": text
   });
 }
 
-writeUserData("bruhhhhhh");
+writeUserData("hello test");
+console.log("hi");
