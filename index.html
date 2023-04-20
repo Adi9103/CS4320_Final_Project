@@ -32,8 +32,13 @@
   <br><br>
   <button type="button" id="submitData2" name="submitData">Log In</button><br><br><br><br>
 
-  <button style="position:absolute; top: 35px; right: 35px; width: 180px; height: 50px; background-color: yellow;" onclick="window.location.href = 'user.html';">User
-    Profile</button>
+  <button style="position:absolute; top: 150px; right: 35px; width: 180px; height: 50px; background-color: yellow; display: none;"
+    id="uprofile">Edit User Profile</button>
+
+  <div id="signedin" style="position:absolute; top: 35px; right: 35px;"></div>
+  <button
+    style="position:absolute; top: 60px; right: 35px; width: 80px; height: 40px; background-color: red; display: none;"
+    id="signoutbtn">Sign Out</button>
 
   <form id="form1">
     First name: <input type="text" name="fname" id="fname"><br>
@@ -49,7 +54,7 @@
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-analytics.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
   import { getDatabase, set, ref, update } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
 
   // TODO: Add SDKs for Firebase products that you want to use
@@ -75,6 +80,30 @@
   const database = getDatabase(app);
 
 
+  document.getElementById("uprofile").addEventListener('click', (e) => {
+      window.location.href = 'user.html';
+  });
+
+  document.getElementById("signoutbtn").addEventListener('click', (e) => {
+    signOut(auth).then(() => {
+      alert('Sign out successful!');
+    }).catch((error) => {
+      alert('Error :(');
+    });
+  });
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      document.getElementById("signedin").textContent = "Signed into: " + user.email;
+      document.getElementById("signoutbtn").style.display = "";
+      document.getElementById("uprofile").style.display = "";
+    } else {
+      document.getElementById("signedin").textContent = "Not signed in";
+      document.getElementById("signoutbtn").style.display = "none";
+      document.getElementById("uprofile").style.display = "none";
+    }
+  });
+
   submitData.addEventListener('click', (e) => {
 
     var email = document.getElementById('email').value;
@@ -86,7 +115,12 @@
         const user = userCredential.user;
         set(ref(database, 'users/' + user.uid), {
           email: email,
-          password: password
+          password: password,
+          firstname: "",
+          lastname: "",
+          cell: "",
+          numhours: 0,
+          address: ""
         })
           .then(() => {
             alert('User created!');
@@ -109,12 +143,12 @@
     var password2 = document.getElementById('password2').value;
 
     signInWithEmailAndPassword(auth, email2, password2)
-    .then((userCredential) => {
-      // Signed in 
-      const user = userCredential.user;
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
 
-      var lgDate = new Date();
-      update(ref(database, 'users/' + user.uid), {
+        var lgDate = new Date();
+        update(ref(database, 'users/' + user.uid), {
           last_login: lgDate,
         })
           .then(() => {
@@ -123,12 +157,12 @@
           .catch((error) => {
             alert(error);
           });
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      alert(errorMessage);
-    });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        alert(errorMessage);
+      });
 
   });
 
